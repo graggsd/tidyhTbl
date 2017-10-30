@@ -14,7 +14,7 @@
 #'  groups
 #' @param cgroup2_td The column in \code{x} specifying the outer most column
 #'  groups
-#' @param rgroup_td The column in \code{x} specifying tspanner groups
+#' @param tspanner_td The column in \code{x} specifying tspanner groups
 #' @return Returns html code that will build a pretty table.
 #' @export
 #' @seealso \code{\link[htmlTable]{htmlTable}}
@@ -61,8 +61,7 @@ htmlTable_td <- function(x,
     htmlTable_args <- list(x = formatted_df,
                            rnames = row_ref_tbl[, rnames_td],
                            header = col_ref_tbl[, header_td],
-                           padding.tspanner = "&nbsp;&nbsp;",
-                           css.tspanner.sep = "border-top: none;")
+                           padding.tspanner = "&nbsp;&nbsp;")
     if (!is.null(rgroup_td)) {
         # This will take care of a problem in which adjacent row groups
         # with the same value will will cause rgroup and tspanner collision
