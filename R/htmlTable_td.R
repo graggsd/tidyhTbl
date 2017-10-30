@@ -29,7 +29,7 @@ htmlTable_td <- function(x,
 
     # Change NA values to "" in all but the cell_value column
     x <- x %>% convert_NA_values(setdiff(colnames(x), cell_value))
-    x[is.na(x[, cell_value]), cell_value] <- "NA"
+    x <- x %>% convert_NA_values(cell_value, fill = "NA")
 
     # Create tables from which to gather row, column, and tspanner names
     # and indices
@@ -196,7 +196,16 @@ add_row_idx <- function(x,
 }
 
 # This function will be used to convert NA values to ""
-convert_NA_values <- function(x, cols) {
-    x[, cols][is.na(x[, cols])] <- ""
+convert_NA_values <- function(x, cols, fill = "") {
+    for (col in cols) {
+        if (is.factor(x[, col])) {
+            levs <- levels(x[, col])
+            x[, col] <- as.character(x[, col])
+            x[, col][is.na(x[, col])] <- fill
+            x[, col] <- factor(x[, col], levels = c(levs, fill))
+        } else {
+            x[, col][is.na(x[, col])] <- fill
+        }
+    }
     return(x)
 }
