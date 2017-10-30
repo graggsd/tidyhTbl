@@ -27,7 +27,9 @@ htmlTable_td <- function(x,
                          cgroup2_td = NULL,
                          tspanner_td = NULL) {
 
+    # Change NA values to "" in all but the cell_value column
     x <- x %>% convert_NA_values(setdiff(colnames(x), cell_value))
+    x[is.na(x[, cell_value]), cell_value] <- "NA"
 
     # Create tables from which to gather row, column, and tspanner names
     # and indices
@@ -51,7 +53,8 @@ htmlTable_td <- function(x,
                     tspanner_td = tspanner_td) %>%
         dplyr::select(to_select) %>%
         tidyr::spread(key = c_idx,
-                      value = cell_value) %>%
+                      value = cell_value,
+                      fill = "") %>%
         dplyr::select(-r_idx)
 
     # Get names and indices for row groups and tspanners
@@ -61,8 +64,14 @@ htmlTable_td <- function(x,
                            padding.tspanner = "&nbsp;&nbsp;",
                            css.tspanner.sep = "border-top: none;")
     if (!is.null(rgroup_td)) {
-        htmlTable_args$rgroup = rle(row_ref_tbl[, rgroup_td])$value
-        htmlTable_args$n.rgroup = rle(row_ref_tbl[, rgroup_td])$lengths
+        # This will take care of a problem in which adjacent row groups
+        # with the same value will will cause rgroup and tspanner collision
+        comp_val <- paste0(row_ref_tbl[, rgroup_td], row_ref_tbl[, tspanner_td])
+        lens <- rle(comp_val)$lengths
+        idx <- cumsum(lens)
+
+        htmlTable_args$rgroup = row_ref_tbl[idx, rgroup_td]
+        htmlTable_args$n.rgroup = lens
     }
     if (!is.null(tspanner_td)) {
         htmlTable_args$tspanner = rle(row_ref_tbl[, tspanner_td])$value
