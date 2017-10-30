@@ -27,13 +27,14 @@ htmlTable_td <- function(x,
                          cgroup2_td = NULL,
                          tspanner_td = NULL) {
 
+    x <- x %>% convert_NA_values(setdiff(colnames(x), cell_value))
+
     # Create tables from which to gather row, column, and tspanner names
     # and indices
     row_ref_tbl <- x %>%
         get_row_tbl(rnames_td = rnames_td,
                     rgroup_td = rgroup_td,
                     tspanner_td = tspanner_td)
-
     col_ref_tbl <- x %>%
         get_col_tbl(header_td = header_td,
                     cgroup1_td = cgroup1_td,
@@ -97,6 +98,8 @@ get_col_tbl <- function(x,
 
     cols <- c(cgroup2_td, cgroup1_td, header_td)
 
+    x <- x %>% convert_NA_values(cols)
+
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
@@ -119,6 +122,8 @@ get_row_tbl <- function(x,
                         tspanner_td = NULL) {
 
     cols <- c(tspanner_td, rgroup_td, rnames_td)
+
+    x <- x %>% convert_NA_values(cols)
 
     out <- x %>%
         dplyr::select(cols) %>%
@@ -143,6 +148,8 @@ add_col_idx <- function(x,
 
     cols <- c(cgroup2_td, cgroup1_td, header_td)
 
+    x <- x %>% convert_NA_values(cols)
+
     col_idx_df <- x %>%
         get_col_tbl(header_td = header_td,
                     cgroup1_td = cgroup1_td,
@@ -164,6 +171,8 @@ add_row_idx <- function(x,
 
     cols <- c(tspanner_td, rgroup_td, rnames_td)
 
+    x <- x %>% convert_NA_values(cols)
+
     row_idx_df <- x %>%
         get_row_tbl(rnames_td = rnames_td,
                     rgroup_td = rgroup_td,
@@ -176,4 +185,10 @@ add_row_idx <- function(x,
         dplyr::select(-key)
 
     return(out)
+}
+
+# This function will be used to convert NA values to ""
+convert_NA_values <- function(x, cols) {
+    x[, cols][is.na(x[, cols])] <- ""
+    return(x)
 }
