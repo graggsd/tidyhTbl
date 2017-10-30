@@ -202,7 +202,7 @@ convert_NA_values <- function(x, cols, fill = "") {
             levs <- levels(x[, col])
             x[, col] <- as.character(x[, col])
             x[, col][is.na(x[, col])] <- fill
-            x[, col] <- factor(x[, col], levels = c(levs, fill))
+            x[, col] <- factor(x[, col], levels = unique(c(levs, fill)))
         } else {
             x[, col][is.na(x[, col])] <- fill
         }
