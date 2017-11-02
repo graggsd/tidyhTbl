@@ -25,7 +25,7 @@ groups}
 \item{cgroup2_td}{The column in \code{x} specifying the outer most column
 groups}
 
-\item{rgroup_td}{The column in \code{x} specifying tspanner groups}
+\item{tspanner_td}{The column in \code{x} specifying tspanner groups}
 }
 \value{
 Returns html code that will build a pretty table.
