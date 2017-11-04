@@ -1,6 +1,6 @@
 #' Combine the levels or unique values of multiple columns into a vector
 #'
-#' \code{gather_factors} is a function designed to collect the factor levels
+#' \code{get_factors} is a function designed to collect the factor levels
 #' and unique values within a series of columns and combine them into one
 #' vector. This may be useful when trying to construct a table using
 #' \code{htmlTable_td}.
@@ -11,7 +11,7 @@
 #' @return Returns a vector of unique values and levels ordered in a manner
 #' consistent with the columns from which they were derived.
 #' @export
-gather_factors <- function(x, cols, rev = FALSE) {
+get_factors <- function(x, cols, rev = FALSE) {
 
     stopifnot(is.numeric(rev) | is.logical(rev))
 
@@ -67,4 +67,30 @@ format_p_val <- function(x, digits = 3) {
     x <- as.character(round(x, digits))
     x[idx] <- paste0("<", cutoff)
     return(x)
+}
+
+#' Function to retrieve the first level from one or more columns in a data.frame
+#'
+#' \code{get_first_levels} is a function that may be used to retrieve the first
+#' level from one or more columns in a data.frame
+#'
+#' @param x A dataframe
+#' @param cols The columns from which to retrieve first levels
+#' @return Returns a vector of first levels
+#' @export
+get_first_levels <- function(x, cols) {
+
+    # Create a vector of levels (revered order of specific columns based on
+    # rev argument)
+    levs <- NULL
+    for (col in cols) {
+        if (is.factor(x[, col])) {
+            levs <- c(levs, levels(x[, col])[1])
+        } else {
+            levs <- c(levs, sort(unique(x[, col]))[1])
+        }
+    }
+
+    names(levs) <- cols
+    return(levs)
 }
