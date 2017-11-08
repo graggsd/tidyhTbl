@@ -1,6 +1,6 @@
 #' Combine the levels or unique values of multiple columns into a vector
 #'
-#' \code{get_factors} is a function designed to collect the factor levels
+#' A function designed to collect the factor levels
 #' and unique values within a series of columns and combine them into one
 #' vector. This may be useful when trying to construct a table using
 #' \code{htmlTable_td}.
@@ -11,7 +11,7 @@
 #' @return Returns a vector of unique values and levels ordered in a manner
 #' consistent with the columns from which they were derived.
 #' @export
-get_factors <- function(x, cols, rev = FALSE) {
+get_factor_levels <- function(x, cols, rev = FALSE) {
 
     stopifnot(is.numeric(rev) | is.logical(rev))
 

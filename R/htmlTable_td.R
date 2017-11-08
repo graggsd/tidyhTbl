@@ -23,9 +23,11 @@ htmlTable_td <- function(x,
                          header_td,
                          rnames_td,
                          rgroup_td = NULL,
+                         hidden_rgroup = NULL,
                          cgroup1_td = NULL,
                          cgroup2_td = NULL,
-                         tspanner_td = NULL) {
+                         tspanner_td = NULL,
+                         hidden_tspanner = NULL) {
 
     # Change NA values to "" in all but the cell_value column
     x <- x %>% convert_NA_values(setdiff(colnames(x), cell_value))
@@ -37,6 +39,19 @@ htmlTable_td <- function(x,
         get_row_tbl(rnames_td = rnames_td,
                     rgroup_td = rgroup_td,
                     tspanner_td = tspanner_td)
+
+    # Hide row groups specified in hidden_rgroup
+    if (!(is.null(hidden_rgroup))) {
+        idx <- row_ref_tbl[, rgroup_td] %in% hidden_rgroup
+        row_ref_tbl[idx, rgroup_td] <- ""
+    }
+
+    # Hide tspanners specified in hidden_tspanner
+    if (!(is.null(hidden_tspanner))) {
+        idx <- row_ref_tbl[, tspanner_td] %in% hidden_tspanner
+        row_ref_tbl[idx, tspanner_td] <- ""
+    }
+
     col_ref_tbl <- x %>%
         get_col_tbl(header_td = header_td,
                     cgroup1_td = cgroup1_td,
@@ -111,7 +126,8 @@ get_col_tbl <- function(x,
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols)
+        dplyr::arrange_(.dots = cols) %>%
+        as.data.frame(stringsAsFactors = FALSE)
 
     out$c_idx <- 1:nrow(out)
 
@@ -136,8 +152,8 @@ get_row_tbl <- function(x,
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols)
-
+        dplyr::arrange_(.dots = cols) %>%
+        as.data.frame(stringsAsFactors = FALSE)
     out$r_idx <- 1:nrow(out)
 
     # To facilitate use of rle
