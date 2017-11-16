@@ -9,9 +9,9 @@ Description: This package was created to convert tidy data into pretty tables
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Imports: htmlTable,
-    tidyr,
+Imports: tidyr,
     dplyr
+Depends: htmlTable
 RoxygenNote: 6.0.1
 URL: http://github.com/graggsd/tidyhTbl
 BugReports: http://github.com/graggsd/tidyhTbl/issues

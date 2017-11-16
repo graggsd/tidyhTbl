@@ -59,6 +59,7 @@ htmlTable_td <- function(x,
 
     # Format the cell_values for display
     to_select <- c("r_idx", "c_idx", cell_value)
+
     formatted_df <- x %>%
         add_col_idx(header_td = header_td,
                     cgroup1_td = cgroup1_td,
