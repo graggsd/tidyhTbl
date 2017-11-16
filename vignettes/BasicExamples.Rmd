@@ -1,0 +1,49 @@
+---
+title: "Basic Examples"
+author: "Stephen Gragg"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Basic Examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+library(tidyverse)
+library(tidyhTbl)
+td <- mtcars %>%
+    rownames_to_column %>%
+    select(rowname, cyl, gear, hp, mpg, qsec) %>%
+    gather(per_metric, value, hp, mpg, qsec) %>%
+    group_by(cyl, gear, per_metric)
+
+tidy_summary <- td %>%
+    summarise(Mean = round(mean(value), 1),
+              SD = round(sd(value), 1),
+              Min = round(min(value), 1),
+              Max = round(max(value), 1)) %>%
+    gather(summary_stat, value, Mean, SD, Min, Max) %>% 
+    ungroup %>% 
+    mutate(gear = paste(gear, "Gears"),
+           cyl = paste(cyl, "Cylinders"))
+
+```
+
+```{r}
+tidy_summary  %>% 
+    htmlTable_td(header_td = "gear",
+                 cgroup1_td = "cyl",
+                 cell_value = "value", 
+                 rnames_td = "summary_stat",
+                 rgroup_td = "per_metric")
+```
+
+```{r}
+tidy_summary  %>% 
+    htmlTable_td(header_td = "summary_stat",
+                 cgroup1_td = "per_metric",
+                 cell_value = "value", 
+                 rnames_td = "gear",
+                 rgroup_td = "cyl")
+```
