@@ -1,2 +1,2 @@
-#' @import htmlTable magrittr
+#' @import magrittr
 NULL

@@ -3,5 +3,4 @@
 export(get_factor_levels)
 export(get_first_levels)
 export(htmlTable_td)
-import(htmlTable)
 import(magrittr)
