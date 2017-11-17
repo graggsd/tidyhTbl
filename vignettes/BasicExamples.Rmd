@@ -9,16 +9,41 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+# Introduction
+
+The `tidyhTbl` package is meant to act as a wrapper function for the `htmlTable`
+function in the `htmlTable` package so that data in a tidy format can be used 
+to fully specify complex html tables.
+
+A strong understanding of the capabilities of the 
+[htmlTable](https://cran.r-project.org/web/packages/htmlTable/index.html)
+package is a pre-requisite for appropriate use of this package. A knowledge of 
+tidy data and the [tidyverse](https://www.tidyverse.org/) are also key to 
+implementing this package appropriately.
+
+# Some Examples
+
+## Prepare Data
+
+We'll begin by turning the `mtcars` data into a tidy dataset. The 
+`gather` function is called to collect 3 performance metrics into a pair 
+of key and value columns.
+
 ```{r}
 library(tidyverse)
 library(tidyhTbl)
 td <- mtcars %>%
     rownames_to_column %>%
     select(rowname, cyl, gear, hp, mpg, qsec) %>%
-    gather(per_metric, value, hp, mpg, qsec) %>%
-    group_by(cyl, gear, per_metric)
+    gather(per_metric, value, hp, mpg, qsec)
+```
 
+Now we will compute 4 summary statistics for each of the 3 performance metrics.
+This will be further grouped by number of cylinders and gears.
+
+```{r}
 tidy_summary <- td %>%
+    group_by(cyl, gear, per_metric) %>% 
     summarise(Mean = round(mean(value), 1),
               SD = round(sd(value), 1),
               Min = round(min(value), 1),
@@ -27,27 +52,30 @@ tidy_summary <- td %>%
     ungroup %>% 
     mutate(gear = paste(gear, "Gears"),
            cyl = paste(cyl, "Cylinders"))
-
 ```
+
+At this point, we are ready to implement the `htmlTable_td` function.
+Essentially, this constructs an html table using arguments similar to the 
+`htmlTable` function. However, whereas `htmlTable` required the user to manually
+arrange the data and specify the column groups, headers, row names, row-groups,
+etc., each of these components of the table is mapped to a column within the
+input data.
+
+## Output html table
+
+### Example 1
 
 ```{r}
 tidy_summary  %>% 
-    as.data.frame %>% 
     htmlTable_td(header_td = "gear",
                  cgroup1_td = "cyl",
                  cell_value = "value", 
                  rnames_td = "summary_stat",
                  rgroup_td = "per_metric")
 
-tidy_summary  %>% 
-    as.data.frame %>% 
-    htmlTable_td(header_td = "gear",
-                 cgroup1_td = "cyl",
-                 cell_value = "value", 
-                 rnames_td = "summary_stat",
-                 rgroup_td = "blue")
-
 ```
+
+### Example 2
 
 ```{r}
 tidy_summary  %>% 
