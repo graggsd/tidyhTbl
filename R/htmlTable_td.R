@@ -9,12 +9,16 @@
 #' @param header_td The column in \code{x} specifying column headings
 #' @param rnames_td The column in \code{x} specifying row names
 #' @param rgroup_td The column in \code{x} specifying row groups
+#' @param hidden_rgroup rgroups that will be hidden.
 #' @param cgroup1_td The column in \code{x} specifying the inner most column
 #'  groups
 #' @param cgroup2_td The column in \code{x} specifying the outer most column
 #'  groups
 #' @param tspanner_td The column in \code{x} specifying tspanner groups
-#' @return Returns html code that will build a pretty table.
+#' @param hidden_tspanner tspanners that will be hidden.
+#' @param ... Additional arguments that will be passed to the inner
+#' \code{htmlTable} function
+#' @return Returns html code that will build a pretty table
 #' @export
 #' @seealso \code{\link[htmlTable]{htmlTable}}
 #' @examples

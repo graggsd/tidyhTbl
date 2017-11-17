@@ -21,6 +21,8 @@ table}
 
 \item{rgroup_td}{The column in \code{x} specifying row groups}
 
+\item{hidden_rgroup}{rgroups that will be hidden.}
+
 \item{cgroup1_td}{The column in \code{x} specifying the inner most column
 groups}
 
@@ -28,9 +30,14 @@ groups}
 groups}
 
 \item{tspanner_td}{The column in \code{x} specifying tspanner groups}
+
+\item{hidden_tspanner}{tspanners that will be hidden.}
+
+\item{...}{Additional arguments that will be passed to the inner
+\code{htmlTable} function}
 }
 \value{
-Returns html code that will build a pretty table.
+Returns html code that will build a pretty table
 }
 \description{
 A wrapper script for \code{htmlTable} that will build an htmlTable using
