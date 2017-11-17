@@ -11,8 +11,8 @@ Encoding: UTF-8
 LazyData: true
 Imports: tidyr,
     dplyr,
-    magrittr
-Depends: htmlTable
+    magrittr,
+    htmlTable
 RoxygenNote: 6.0.1
 URL: http://github.com/graggsd/tidyhTbl
 BugReports: http://github.com/graggsd/tidyhTbl/issues
