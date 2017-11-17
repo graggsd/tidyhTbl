@@ -16,6 +16,9 @@
 #'  groups
 #' @param tspanner_td The column in \code{x} specifying tspanner groups
 #' @param hidden_tspanner tspanners that will be hidden.
+#' @param debug_l Setting to true will print a message at certain points in the
+#' execution of the function. This is meant to only be a temporary feature
+#' as I learn to better utilizing existing debugging features in R Studio.
 #' @param ... Additional arguments that will be passed to the inner
 #' \code{htmlTable} function
 #' @return Returns html code that will build a pretty table
@@ -112,14 +115,18 @@ htmlTable_td.data.frame <- function(x,
 
     # Hide row groups specified in hidden_rgroup
     if (!(is.null(hidden_rgroup))) {
-        idx <- row_ref_tbl[, rgroup_td] %in% hidden_rgroup
-        row_ref_tbl[idx, rgroup_td] <- ""
+
+        row_ref_tbl <- row_ref_tbl %>%
+            mutate_at(rgroup_td,
+                      function(x){ifelse(x %in% hidden_rgroup, "", x)})
     }
 
     # Hide tspanners specified in hidden_tspanner
     if (!(is.null(hidden_tspanner))) {
-        idx <- row_ref_tbl[, tspanner_td] %in% hidden_tspanner
-        row_ref_tbl[idx, tspanner_td] <- ""
+
+        row_ref_tbl <- row_ref_tbl %>%
+            mutate_at(tspanner_td,
+                      function(x){ifelse(x %in% hidden_tspanner, "", x)})
     }
 
     if (debug_l) print("S3 complete")
@@ -162,14 +169,14 @@ htmlTable_td.data.frame <- function(x,
     if (debug_l) print("S6 complete")
 
     if (!is.null(rgroup_td)) {
+
         # This will take care of a problem in which adjacent row groups
         # with the same value will cause rgroup and tspanner collision
-        # comp_val <- paste0(row_ref_tbl[, rgroup_td], row_ref_tbl[, tspanner_td])
-
         comp_val <- row_ref_tbl %>% dplyr::pull(rgroup_td)
 
         if (!is.null(tspanner_td)) {
-            comp_val <- paste0(comp_val, row_ref_tbl %>% dplyr::pull(tspanner_td))
+            comp_val <- paste0(comp_val,
+                               row_ref_tbl %>% dplyr::pull(tspanner_td))
         }
 
         lens <- rle(comp_val)$lengths
