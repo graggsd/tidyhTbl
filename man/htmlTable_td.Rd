@@ -7,7 +7,7 @@
 htmlTable_td(x, value = "value", header_td = "header",
   rnames_td = "rnames", rgroup_td = NULL, hidden_rgroup = NULL,
   cgroup1_td = NULL, cgroup2_td = NULL, tspanner_td = NULL,
-  hidden_tspanner = NULL, ...)
+  hidden_tspanner = NULL, debug_l = FALSE, ...)
 }
 \arguments{
 \item{x}{The tidy data used to build the table}
@@ -32,6 +32,10 @@ groups}
 \item{tspanner_td}{The column in \code{x} specifying tspanner groups}
 
 \item{hidden_tspanner}{tspanners that will be hidden.}
+
+\item{debug_l}{Setting to true will print a message at certain points in the
+execution of the function. This is meant to only be a temporary feature
+as I learn to better utilizing existing debugging features in R Studio.}
 
 \item{...}{Additional arguments that will be passed to the inner
 \code{htmlTable} function}

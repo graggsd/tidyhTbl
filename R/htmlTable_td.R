@@ -53,6 +53,7 @@ htmlTable_td <- function(x,
                          cgroup2_td = NULL,
                          tspanner_td = NULL,
                          hidden_tspanner = NULL,
+                         debug_l = FALSE,
                          ...) {
     UseMethod("htmlTable_td")
 }
@@ -68,6 +69,7 @@ htmlTable_td.data.frame <- function(x,
                                     cgroup2_td = NULL,
                                     tspanner_td = NULL,
                                     hidden_tspanner = NULL,
+                                    debug_l = FALSE,
                                     ...) {
 
     argument_checker(x,
@@ -97,12 +99,16 @@ htmlTable_td.data.frame <- function(x,
                         cgroup2_td = cgroup2_td,
                         tspanner_td = tspanner_td)
 
+    if (debug_l) print("S1 complete")
+
     # Create tables from which to gather row, column, and tspanner names
     # and indices
     row_ref_tbl <- x %>%
         get_row_tbl(rnames_td = rnames_td,
                     rgroup_td = rgroup_td,
                     tspanner_td = tspanner_td)
+
+    if (debug_l) print("S2 complete")
 
     # Hide row groups specified in hidden_rgroup
     if (!(is.null(hidden_rgroup))) {
@@ -116,10 +122,14 @@ htmlTable_td.data.frame <- function(x,
         row_ref_tbl[idx, tspanner_td] <- ""
     }
 
+    if (debug_l) print("S3 complete")
+
     col_ref_tbl <- x %>%
         get_col_tbl(header_td = header_td,
                     cgroup1_td = cgroup1_td,
                     cgroup2_td = cgroup2_td)
+
+    if (debug_l) print("S4 complete")
 
     # Format the values for display
     to_select <- c("r_idx", "c_idx", value)
@@ -141,11 +151,16 @@ htmlTable_td.data.frame <- function(x,
                       fill = "") %>%
         dplyr::select(-r_idx)
 
+    if (debug_l) print("S5 complete")
+
     # Get names and indices for row groups and tspanners
     htmlTable_args <- list(x = formatted_df,
                            rnames = row_ref_tbl %>% dplyr::pull(rnames_td),
                            header = col_ref_tbl %>% dplyr::pull(header_td),
                            ...)
+
+    if (debug_l) print("S6 complete")
+
     if (!is.null(rgroup_td)) {
         # This will take care of a problem in which adjacent row groups
         # with the same value will cause rgroup and tspanner collision
@@ -166,12 +181,17 @@ htmlTable_td.data.frame <- function(x,
 
         htmlTable_args$n.rgroup <- lens
     }
+
+    if (debug_l) print("S7 complete")
+
     if (!is.null(tspanner_td)) {
         htmlTable_args$tspanner <-
             rle(row_ref_tbl %>% dplyr::pull(tspanner_td))$value
         htmlTable_args$n.tspanner <-
             rle(row_ref_tbl %>% dplyr::pull(tspanner_td))$lengths
     }
+
+    if (debug_l) print("S8 complete")
 
     # Get names and indices for column groups
     if(!is.null(cgroup1_td)) {
@@ -193,6 +213,9 @@ htmlTable_td.data.frame <- function(x,
         htmlTable_args$cgroup <- cgroup1
         htmlTable_args$n.cgroup <- n.cgroup1
     }
+
+    if (debug_l) print("S9 complete")
+
     do.call(htmlTable::htmlTable, htmlTable_args)
 }
 
@@ -294,7 +317,10 @@ get_col_tbl <- function(x,
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols)
+        dplyr::arrange_(.dots = cols) %>%
+        # This is necessary in order to not generate NA values when setting
+        # hidden elements to ""
+        dplyr::mutate_if(is.factor, as.character)
 
     out$c_idx <- 1:nrow(out)
 
@@ -311,7 +337,10 @@ get_row_tbl <- function(x,
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols)
+        dplyr::arrange_(.dots = cols) %>%
+        # This is necessary in order to not generate NA values when setting
+        # hidden elements to ""
+        dplyr::mutate_if(is.factor, as.character)
 
     out$r_idx <- 1:nrow(out)
 
