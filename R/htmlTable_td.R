@@ -4,7 +4,7 @@
 #' tidy data and mapping elements of the table to specific columns.
 #'
 #' @param x The tidy set of data from which to build the htmlTable
-#' @param cell_value The individual values which will fill each cell of the
+#' @param value The individual values which will fill each cell of the
 #' table
 #' @param header_td The column in \code{x} specifying column headings
 #' @param rnames_td The column in \code{x} specifying row names
@@ -18,7 +18,7 @@
 #' @export
 #' @seealso \code{\link[htmlTable]{htmlTable}}
 htmlTable_td <- function(x,
-                         cell_value,
+                         value,
                          header_td,
                          rnames_td,
                          rgroup_td = NULL,
@@ -33,7 +33,7 @@ htmlTable_td <- function(x,
 
 #' @export
 htmlTable_td.data.frame <- function(x,
-                                    cell_value,
+                                    value,
                                     header_td,
                                     rnames_td,
                                     rgroup_td = NULL,
@@ -44,9 +44,9 @@ htmlTable_td.data.frame <- function(x,
                                     hidden_tspanner = NULL,
                                     ...) {
 
-    # Change NA values to "" in all but the cell_value column
-    x <- x %>% convert_NA_values(setdiff(colnames(x), cell_value))
-    x <- x %>% convert_NA_values(cell_value, fill = "NA")
+    # Change NA values to "" in all but the value column
+    x <- x %>% convert_NA_values(setdiff(colnames(x), value))
+    x <- x %>% convert_NA_values(value, fill = "NA")
 
     # Create tables from which to gather row, column, and tspanner names
     # and indices
@@ -72,8 +72,8 @@ htmlTable_td.data.frame <- function(x,
                     cgroup1_td = cgroup1_td,
                     cgroup2_td = cgroup2_td)
 
-    # Format the cell_values for display
-    to_select <- c("r_idx", "c_idx", cell_value)
+    # Format the values for display
+    to_select <- c("r_idx", "c_idx", value)
 
     formatted_df <- x %>%
         add_col_idx(header_td = header_td,
@@ -84,7 +84,7 @@ htmlTable_td.data.frame <- function(x,
                     tspanner_td = tspanner_td) %>%
         dplyr::select(to_select) %>%
         tidyr::spread(key = c_idx,
-                      value = cell_value,
+                      value = value,
                       fill = "") %>%
         dplyr::select(-r_idx)
 
