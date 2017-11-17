@@ -10,7 +10,8 @@ License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports: tidyr,
-    dplyr
+    dplyr,
+    magrittr
 Depends: htmlTable
 RoxygenNote: 6.0.1
 URL: http://github.com/graggsd/tidyhTbl
