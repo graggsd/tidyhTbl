@@ -32,7 +32,9 @@ We'll begin by turning the `mtcars` data into a tidy dataset. The
 of key and value columns.
 
 ```{r}
-library(tidyverse)
+library(magrittr)
+library(tidyr)
+library(dplyr)
 library(tidyhTbl)
 td <- mtcars %>%
     rownames_to_column %>%
