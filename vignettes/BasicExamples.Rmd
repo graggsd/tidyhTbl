@@ -9,8 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-[![Build Status](https://travis-ci.org/graggsd/tidyhTbl.svg?branch=master)](https://travis-ci.org/graggsd/tidyhTbl)
-
 # Introduction
 
 The `tidyhTbl` package is meant to act as a wrapper function for the `htmlTable`
@@ -31,11 +29,12 @@ We'll begin by turning the `mtcars` data into a tidy dataset. The
 `gather` function is called to collect 3 performance metrics into a pair 
 of key and value columns.
 
-```{r}
+```{r, message=FALSE}
 library(magrittr)
 library(tidyr)
 library(dplyr)
 library(tidyhTbl)
+library(tibble)
 td <- mtcars %>%
     rownames_to_column %>%
     select(rowname, cyl, gear, hp, mpg, qsec) %>%

@@ -12,6 +12,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+[![Build Status](https://travis-ci.org/graggsd/tidyhTbl.svg?branch=master)](https://travis-ci.org/graggsd/tidyhTbl)
+
 # tidyhTbl
 
 The goal of tidyhTbl is to wrap the `htmlTable` function from the 
@@ -31,11 +33,12 @@ devtools::install_github("graggsd/tidyhTbl")
 
 This is a basic example which shows you how to solve a common problem:
 
-```{r example}
+```{r example, message=FALSE}
 library(magrittr)
 library(tidyr)
 library(dplyr)
 library(tidyhTbl)
+library(tibble)
 mtcars %>%
     rownames_to_column %>%
     select(rowname, cyl, gear, hp, mpg, qsec) %>%
