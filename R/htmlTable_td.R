@@ -1,8 +1,7 @@
 #' Generate an htmlTable from tidy data
 #'
-#' \code{htmlTable_td} is a wrapper script for \code{htmlTable} that will build
-#' an htmlTable using tidy-format data and by mapping various elements of the
-#' table to individual columns.
+#' A wrapper script for \code{htmlTable} that will build an htmlTable using
+#' tidy data and mapping elements of the table to specific columns.
 #'
 #' @param x The tidy set of data from which to build the htmlTable
 #' @param cell_value The individual values which will fill each cell of the
@@ -27,7 +26,23 @@ htmlTable_td <- function(x,
                          cgroup1_td = NULL,
                          cgroup2_td = NULL,
                          tspanner_td = NULL,
-                         hidden_tspanner = NULL) {
+                         hidden_tspanner = NULL,
+                         ...) {
+    UseMethod("htmlTable_td")
+}
+
+#' @export
+htmlTable_td.data.frame <- function(x,
+                                    cell_value,
+                                    header_td,
+                                    rnames_td,
+                                    rgroup_td = NULL,
+                                    hidden_rgroup = NULL,
+                                    cgroup1_td = NULL,
+                                    cgroup2_td = NULL,
+                                    tspanner_td = NULL,
+                                    hidden_tspanner = NULL,
+                                    ...) {
 
     # Change NA values to "" in all but the cell_value column
     x <- x %>% convert_NA_values(setdiff(colnames(x), cell_value))
@@ -77,7 +92,7 @@ htmlTable_td <- function(x,
     htmlTable_args <- list(x = formatted_df,
                            rnames = row_ref_tbl[, rnames_td],
                            header = col_ref_tbl[, header_td],
-                           padding.tspanner = "&nbsp;&nbsp;")
+                           ...)
     if (!is.null(rgroup_td)) {
         # This will take care of a problem in which adjacent row groups
         # with the same value will will cause rgroup and tspanner collision
@@ -208,7 +223,6 @@ add_row_idx <- function(x,
         tidyr::unite_(col = "key", from = cols, remove = FALSE) %>%
         dplyr::left_join(row_idx_df, "key") %>%
         dplyr::select(-key)
-
     return(out)
 }
 

@@ -32,6 +32,7 @@ tidy_summary <- td %>%
 
 ```{r}
 tidy_summary  %>% 
+    as.data.frame %>% 
     htmlTable_td(header_td = "gear",
                  cgroup1_td = "cyl",
                  cell_value = "value", 

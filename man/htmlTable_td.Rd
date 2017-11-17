@@ -6,7 +6,7 @@
 \usage{
 htmlTable_td(x, cell_value, header_td, rnames_td, rgroup_td = NULL,
   hidden_rgroup = NULL, cgroup1_td = NULL, cgroup2_td = NULL,
-  tspanner_td = NULL, hidden_tspanner = NULL)
+  tspanner_td = NULL, hidden_tspanner = NULL, ...)
 }
 \arguments{
 \item{x}{The tidy set of data from which to build the htmlTable}
@@ -32,7 +32,7 @@ groups}
 Returns html code that will build a pretty table.
 }
 \description{
-\code{htmlTable_td} is a wrapper script for \code{htmlTable} that will build
+A wrapper script for \code{htmlTable} that will build
 an htmlTable using tidy-format data and by mapping various elements of the
 table to individual columns.
 }
