@@ -4,14 +4,15 @@
 \alias{htmlTable_td}
 \title{Generate an htmlTable from tidy data}
 \usage{
-htmlTable_td(x, cell_value, header_td, rnames_td, rgroup_td = NULL,
-  hidden_rgroup = NULL, cgroup1_td = NULL, cgroup2_td = NULL,
-  tspanner_td = NULL, hidden_tspanner = NULL, ...)
+htmlTable_td(x, value = "value", header_td = "header",
+  rnames_td = "rnames", rgroup_td = NULL, hidden_rgroup = NULL,
+  cgroup1_td = NULL, cgroup2_td = NULL, tspanner_td = NULL,
+  hidden_tspanner = NULL, ...)
 }
 \arguments{
-\item{x}{The tidy set of data from which to build the htmlTable}
+\item{x}{The tidy data used to build the table}
 
-\item{cell_value}{The individual values which will fill each cell of the
+\item{value}{The individual values which will fill each cell of the
 table}
 
 \item{header_td}{The column in \code{x} specifying column headings}
@@ -32,9 +33,8 @@ groups}
 Returns html code that will build a pretty table.
 }
 \description{
-A wrapper script for \code{htmlTable} that will build
-an htmlTable using tidy-format data and by mapping various elements of the
-table to individual columns.
+A wrapper script for \code{htmlTable} that will build an htmlTable using
+tidy data and mapping elements of the table to specific columns.
 }
 \seealso{
 \code{\link[htmlTable]{htmlTable}}

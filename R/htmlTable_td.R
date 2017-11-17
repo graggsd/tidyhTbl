@@ -56,7 +56,6 @@ htmlTable_td.data.frame <- function(x,
                      hidden_tspanner = NULL)
 
     check_uniqueness(x,
-                     value = value,
                      header_td = header_td,
                      rnames_td = rnames_td,
                      rgroup_td = rgroup_td,
@@ -64,13 +63,13 @@ htmlTable_td.data.frame <- function(x,
                      cgroup2_td = cgroup2_td,
                      tspanner_td = tspanner_td)
 
-    # Change NA values to "" in all but the value column
-    # This is to allow blank values to work similar to how they do in the
-    # real package, but I am thinking about removing this feature to make
-    # everything more explicit and allowing some specific rgroups tspanners
-    # etc to be hidden instead.
-    x <- x %>% convert_NA_values(setdiff(colnames(x), value))
-    x <- x %>% convert_NA_values(value, fill = "NA")
+    x <- remove_na_rows(x,
+                        header_td = header_td,
+                        rnames_td = rnames_td,
+                        rgroup_td = rgroup_td,
+                        cgroup1_td = cgroup1_td,
+                        cgroup2_td = cgroup2_td,
+                        tspanner_td = tspanner_td)
 
     # Create tables from which to gather row, column, and tspanner names
     # and indices
@@ -107,6 +106,10 @@ htmlTable_td.data.frame <- function(x,
                     rgroup_td = rgroup_td,
                     tspanner_td = tspanner_td) %>%
         dplyr::select(to_select) %>%
+        dplyr::mutate_at(value, as.character) %>%
+        # Spread will fill missing values (both explict and implicit) with the
+        # same value, so we need to convert these values to a character if we want
+        # them to show up correctly in the final table
         tidyr::spread(key = c_idx,
                       value = value,
                       fill = "") %>%
@@ -114,30 +117,43 @@ htmlTable_td.data.frame <- function(x,
 
     # Get names and indices for row groups and tspanners
     htmlTable_args <- list(x = formatted_df,
-                           rnames = row_ref_tbl[, rnames_td],
-                           header = col_ref_tbl[, header_td],
+                           rnames = row_ref_tbl %>% dplyr::pull(rnames_td),
+                           header = col_ref_tbl %>% dplyr::pull(header_td),
                            ...)
     if (!is.null(rgroup_td)) {
         # This will take care of a problem in which adjacent row groups
         # with the same value will cause rgroup and tspanner collision
-        comp_val <- paste0(row_ref_tbl[, rgroup_td], row_ref_tbl[, tspanner_td])
+        # comp_val <- paste0(row_ref_tbl[, rgroup_td], row_ref_tbl[, tspanner_td])
+
+        comp_val <- row_ref_tbl %>% dplyr::pull(rgroup_td)
+
+        if (!is.null(tspanner_td)) {
+            comp_val <- paste0(comp_val, row_ref_tbl %>% dplyr::pull(tspanner_td))
+        }
+
         lens <- rle(comp_val)$lengths
         idx <- cumsum(lens)
 
-        htmlTable_args$rgroup = row_ref_tbl[idx, rgroup_td]
-        htmlTable_args$n.rgroup = lens
+        htmlTable_args$rgroup <- row_ref_tbl %>%
+            dplyr::slice(idx) %>%
+            dplyr::pull(rgroup_td)
+
+        htmlTable_args$n.rgroup <- lens
     }
     if (!is.null(tspanner_td)) {
-        htmlTable_args$tspanner = rle(row_ref_tbl[, tspanner_td])$value
-        htmlTable_args$n.tspanner = rle(row_ref_tbl[, tspanner_td])$lengths
+        htmlTable_args$tspanner <-
+            rle(row_ref_tbl %>% dplyr::pull(tspanner_td))$value
+        htmlTable_args$n.tspanner <-
+            rle(row_ref_tbl %>% dplyr::pull(tspanner_td))$lengths
     }
+
     # Get names and indices for column groups
     if(!is.null(cgroup1_td)) {
-        cgroup1 <- rle(col_ref_tbl[, cgroup1_td])$value
-        n.cgroup1 <- rle(col_ref_tbl[, cgroup1_td])$lengths
+        cgroup1 <- rle(col_ref_tbl %>% dplyr::pull(cgroup1_td))$value
+        n.cgroup1 <- rle(col_ref_tbl %>% dplyr::pull(cgroup1_td))$lengths
         if(!is.null(cgroup2_td)) {
-            cgroup2 <- rle(col_ref_tbl[, cgroup2_td])$value
-            n.cgroup2 <- rle(col_ref_tbl[, cgroup2_td])$lengths
+            cgroup2 <- rle(col_ref_tbl %>% dplyr::pull(cgroup2_td))$value
+            n.cgroup2 <- rle(col_ref_tbl %>% dplyr::pull(cgroup2_td))$lengths
             len_diff <- length(cgroup1) - length(cgroup2)
             if (len_diff < 0) {
                 stop("cgroup2 cannot contain more categories than cgroup1")
@@ -154,10 +170,28 @@ htmlTable_td.data.frame <- function(x,
     do.call(htmlTable::htmlTable, htmlTable_args)
 }
 
-#' @export
-htmlTable_td.tbl_df <- function(x, ...) {
-    x <- x %>% as.data.frame(x, stringAsFactors = FALSE)
-    htmlTable_td(x, ...)
+remove_na_rows <- function(x, ...) {
+    cols <- as.character(get_col_vars(...))
+    na.log <- x %>%
+        dplyr::select(cols) %>%
+        is.na
+
+    na.row.sums <- na.log %>%
+        rowSums
+
+    keep.idx <- na.row.sums == 0
+    removed <- sum(na.row.sums > 0)
+
+    if (removed != 0) {
+        na.col.sums <- na.log %>%
+            colSums
+        na.cols <- colnames(na.log)[na.col.sums > 0]
+        warning(paste0("NA values were detected in the following columns of ",
+                       "the tidy dataset: ",
+                       paste(na.cols, collapse = ", "), ". ",
+                       removed, " row(s) in the tidy dataset were removed."))
+    }
+    return(x[keep.idx,])
 }
 
 check_uniqueness <- function(x, ...) {
@@ -165,7 +199,7 @@ check_uniqueness <- function(x, ...) {
     args <- simplify_arg_list(...)
     cols <- as.character(args)
     dupes <- x %>%
-        select(cols) %>%
+        dplyr::select(cols) %>%
         duplicated
     if (sum(dupes) != 0) {
 
@@ -183,6 +217,15 @@ simplify_arg_list <- function(...) {
     return(x[!idx])
 }
 
+get_col_vars <- function(...) {
+    out <- simplify_arg_list(...)
+    return(out[names(out) %in%
+                   c("value", "header_td",
+                     "rnames_td", "rgroup_td",
+                     "cgroup1_td", "cgroup2_td",
+                     "tspanner_td")])
+}
+
 argument_checker <- function(x, ...) {
 
     # Check that all the input are characters
@@ -196,9 +239,7 @@ argument_checker <- function(x, ...) {
 
     # Check that all of the arguments that would be used map columns to
     # character attributes are of length 1
-    col_vars <- all_args[names(all_args) %in%
-                             c("value", "header_td", "rnames_td", "rgroup_td",
-                               "cgroup1_td", "cgroup2_td", "tspanner_td")]
+    col_vars <- get_col_vars(...)
 
     idx <- which(sapply(col_vars, length) > 1)
     if (length(idx) > 0) {
@@ -224,21 +265,12 @@ get_col_tbl <- function(x,
 
     cols <- c(cgroup2_td, cgroup1_td, header_td)
 
-    x <- x %>% convert_NA_values(cols)
-
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols) %>%
-        as.data.frame(stringsAsFactors = FALSE)
+        dplyr::arrange_(.dots = cols)
 
     out$c_idx <- 1:nrow(out)
-
-    # To facilitate use of rle
-    for(col in cols) {
-        out[, col] <- as.character(out[, col])
-        out[, col][is.na(out[, col])] <- ""
-    }
 
     return(out)
 }
@@ -250,20 +282,12 @@ get_row_tbl <- function(x,
 
     cols <- c(tspanner_td, rgroup_td, rnames_td)
 
-    x <- x %>% convert_NA_values(cols)
-
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols) %>%
-        as.data.frame(stringsAsFactors = FALSE)
-    out$r_idx <- 1:nrow(out)
+        dplyr::arrange_(.dots = cols)
 
-    # To facilitate use of rle
-    for(col in cols) {
-        out[, col] <- as.character(out[, col])
-        out[, col][is.na(out[, col])] <- ""
-    }
+    out$r_idx <- 1:nrow(out)
 
     return(out)
 }
@@ -275,18 +299,13 @@ add_col_idx <- function(x,
 
     cols <- c(cgroup2_td, cgroup1_td, header_td)
 
-    x <- x %>% convert_NA_values(cols)
-
     col_idx_df <- x %>%
         get_col_tbl(header_td = header_td,
                     cgroup1_td = cgroup1_td,
-                    cgroup2_td = cgroup2_td) %>%
-        tidyr::unite_(col = "key", from = cols)
+                    cgroup2_td = cgroup2_td)
 
     out <- x %>%
-        tidyr::unite_(col = "key", from = cols, remove = FALSE) %>%
-        dplyr::left_join(col_idx_df, "key") %>%
-        dplyr::select(-key)
+        dplyr::left_join(col_idx_df, cols)
 
     return(out)
 }
@@ -298,32 +317,13 @@ add_row_idx <- function(x,
 
     cols <- c(tspanner_td, rgroup_td, rnames_td)
 
-    x <- x %>% convert_NA_values(cols)
-
     row_idx_df <- x %>%
         get_row_tbl(rnames_td = rnames_td,
                     rgroup_td = rgroup_td,
-                    tspanner_td = tspanner_td) %>%
-        tidyr::unite_(col = "key", from = cols)
+                    tspanner_td = tspanner_td)
 
     out <- x %>%
-        tidyr::unite_(col = "key", from = cols, remove = FALSE) %>%
-        dplyr::left_join(row_idx_df, "key") %>%
-        dplyr::select(-key)
-    return(out)
-}
+        dplyr::left_join(row_idx_df, by = cols)
 
-# This function will be used to convert NA values to ""
-convert_NA_values <- function(x, cols, fill = "") {
-    for (col in cols) {
-        if (is.factor(x[, col])) {
-            levs <- levels(x[, col])
-            x[, col] <- as.character(x[, col])
-            x[, col][is.na(x[, col])] <- fill
-            x[, col] <- factor(x[, col], levels = unique(c(levs, fill)))
-        } else {
-            x[, col][is.na(x[, col])] <- fill
-        }
-    }
-    return(x)
+    return(out)
 }
