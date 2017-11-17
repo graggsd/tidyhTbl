@@ -38,6 +38,15 @@ tidy_summary  %>%
                  cell_value = "value", 
                  rnames_td = "summary_stat",
                  rgroup_td = "per_metric")
+
+tidy_summary  %>% 
+    as.data.frame %>% 
+    htmlTable_td(header_td = "gear",
+                 cgroup1_td = "cyl",
+                 cell_value = "value", 
+                 rnames_td = "summary_stat",
+                 rgroup_td = "blue")
+
 ```
 
 ```{r}

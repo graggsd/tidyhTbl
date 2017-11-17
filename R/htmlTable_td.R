@@ -3,7 +3,7 @@
 #' A wrapper script for \code{htmlTable} that will build an htmlTable using
 #' tidy data and mapping elements of the table to specific columns.
 #'
-#' @param x The tidy set of data from which to build the htmlTable
+#' @param x The tidy data used to build the table
 #' @param value The individual values which will fill each cell of the
 #' table
 #' @param header_td The column in \code{x} specifying column headings
@@ -18,9 +18,9 @@
 #' @export
 #' @seealso \code{\link[htmlTable]{htmlTable}}
 htmlTable_td <- function(x,
-                         value,
-                         header_td,
-                         rnames_td,
+                         value = "value",
+                         header_td = "header",
+                         rnames_td = "rnames",
                          rgroup_td = NULL,
                          hidden_rgroup = NULL,
                          cgroup1_td = NULL,
@@ -33,9 +33,9 @@ htmlTable_td <- function(x,
 
 #' @export
 htmlTable_td.data.frame <- function(x,
-                                    value,
-                                    header_td,
-                                    rnames_td,
+                                    value = "value",
+                                    header_td = "header",
+                                    rnames_td = "rnames",
                                     rgroup_td = NULL,
                                     hidden_rgroup = NULL,
                                     cgroup1_td = NULL,
@@ -44,7 +44,31 @@ htmlTable_td.data.frame <- function(x,
                                     hidden_tspanner = NULL,
                                     ...) {
 
+    argument_checker(x,
+                     value = value,
+                     header_td = header_td,
+                     rnames_td = rnames_td,
+                     rgroup_td = rgroup_td,
+                     hidden_rgroup = NULL,
+                     cgroup1_td = cgroup1_td,
+                     cgroup2_td = cgroup2_td,
+                     tspanner_td = tspanner_td,
+                     hidden_tspanner = NULL)
+
+    check_uniqueness(x,
+                     value = value,
+                     header_td = header_td,
+                     rnames_td = rnames_td,
+                     rgroup_td = rgroup_td,
+                     cgroup1_td = cgroup1_td,
+                     cgroup2_td = cgroup2_td,
+                     tspanner_td = tspanner_td)
+
     # Change NA values to "" in all but the value column
+    # This is to allow blank values to work similar to how they do in the
+    # real package, but I am thinking about removing this feature to make
+    # everything more explicit and allowing some specific rgroups tspanners
+    # etc to be hidden instead.
     x <- x %>% convert_NA_values(setdiff(colnames(x), value))
     x <- x %>% convert_NA_values(value, fill = "NA")
 
@@ -95,7 +119,7 @@ htmlTable_td.data.frame <- function(x,
                            ...)
     if (!is.null(rgroup_td)) {
         # This will take care of a problem in which adjacent row groups
-        # with the same value will will cause rgroup and tspanner collision
+        # with the same value will cause rgroup and tspanner collision
         comp_val <- paste0(row_ref_tbl[, rgroup_td], row_ref_tbl[, tspanner_td])
         lens <- rle(comp_val)$lengths
         idx <- cumsum(lens)
@@ -128,6 +152,62 @@ htmlTable_td.data.frame <- function(x,
         htmlTable_args$n.cgroup <- n.cgroup1
     }
     do.call(htmlTable::htmlTable, htmlTable_args)
+}
+
+check_uniqueness <- function(x, ...) {
+    # Get arguments
+    args <- simplify_arg_list(...)
+    cols <- as.character(args)
+    dupes <- x %>%
+        select(cols) %>%
+        duplicated
+    if (sum(dupes) != 0) {
+
+        stop(paste0("The input parameters ",paste(paste0("\"", names(args), "\""), collapse = ", "),
+                    " do not specify unique rows. The following rows ",
+                    "are duplicated: ",
+                    paste(which(dupes), collapse = ", ")))
+    }
+}
+
+simplify_arg_list <- function(...) {
+    x <- list(...)
+    idx <- sapply(x, is.null)
+    return(x[!idx])
+}
+
+argument_checker <- function(x, ...) {
+
+    # Check that all the input are characters
+    all_args <- simplify_arg_list(...)
+    idx <- which(!sapply(all_args, is.character))
+
+    if (length(idx) > 0) {
+        stop("The following parameters must be of type character: ",
+             paste(names(all_args)[idx], collapse = ", "))
+    }
+
+    # Check that all of the arguments that would be used map columns to
+    # character attributes are of length 1
+    col_vars <- all_args[names(all_args) %in%
+                             c("value", "header_td", "rnames_td", "rgroup_td",
+                               "cgroup1_td", "cgroup2_td", "tspanner_td")]
+
+    idx <- which(sapply(col_vars, length) > 1)
+    if (length(idx) > 0) {
+        stop("The following parameters must be of length 1: ",
+             paste(names(col_vars)[idx], collapse = ", "))
+    }
+
+    # Find column variables that are not columns in the dataset
+    idx <- which(!(as.character(col_vars) %in% colnames(x)))
+    if (length(idx) > 0) {
+        stop("The following arguments need values that correspond to column ",
+             "names in x: ",
+             paste0(names(col_vars), " = ",
+                    as.character(col_vars),
+                    collapse = ", "))
+    }
 }
 
 get_col_tbl <- function(x,
