@@ -18,6 +18,7 @@
 #' @export
 #' @seealso \code{\link[htmlTable]{htmlTable}}
 #' @examples
+#' \dontrun{
 #' mtcars %>%
 #'     rownames_to_column %>%
 #'     select(rowname, cyl, gear, hp, mpg, qsec) %>%
@@ -36,6 +37,7 @@
 #'                   cell_value = "value",
 #'                   rnames_td = "summary_stat",
 #'                   rgroup_td = "per_metric")
+#' }
 htmlTable_td <- function(x,
                          value = "value",
                          header_td = "header",

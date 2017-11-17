@@ -37,6 +37,7 @@ A wrapper script for \code{htmlTable} that will build an htmlTable using
 tidy data and mapping elements of the table to specific columns.
 }
 \examples{
+\dontrun{
 mtcars \%>\%
     rownames_to_column \%>\%
     select(rowname, cyl, gear, hp, mpg, qsec) \%>\%
@@ -55,6 +56,7 @@ mtcars \%>\%
                   cell_value = "value",
                   rnames_td = "summary_stat",
                   rgroup_td = "per_metric")
+}
 }
 \seealso{
 \code{\link[htmlTable]{htmlTable}}
