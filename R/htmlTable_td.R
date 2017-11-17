@@ -154,6 +154,12 @@ htmlTable_td.data.frame <- function(x,
     do.call(htmlTable::htmlTable, htmlTable_args)
 }
 
+#' @export
+htmlTable_td.tbl_df <- function(x, ...) {
+    x <- x %>% as.data.frame(x, stringAsFactors = FALSE)
+    htmlTable_td(x, ...)
+}
+
 check_uniqueness <- function(x, ...) {
     # Get arguments
     args <- simplify_arg_list(...)
@@ -163,7 +169,8 @@ check_uniqueness <- function(x, ...) {
         duplicated
     if (sum(dupes) != 0) {
 
-        stop(paste0("The input parameters ",paste(paste0("\"", names(args), "\""), collapse = ", "),
+        stop(paste0("The input parameters ",
+                    paste(paste0("\"", names(args), "\""), collapse = ", "),
                     " do not specify unique rows. The following rows ",
                     "are duplicated: ",
                     paste(which(dupes), collapse = ", ")))
