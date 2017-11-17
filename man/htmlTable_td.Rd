@@ -36,6 +36,26 @@ Returns html code that will build a pretty table.
 A wrapper script for \code{htmlTable} that will build an htmlTable using
 tidy data and mapping elements of the table to specific columns.
 }
+\examples{
+mtcars \%>\%
+    rownames_to_column \%>\%
+    select(rowname, cyl, gear, hp, mpg, qsec) \%>\%
+    gather(per_metric, value, hp, mpg, qsec) \%>\%
+    group_by(cyl, gear, per_metric) \%>\%
+    summarise(Mean = round(mean(value), 1), \%>\%
+              SD = round(sd(value), 1),
+              Min = round(min(value), 1),
+              Max = round(max(value), 1)) \%>\%
+     gather(summary_stat, value, Mean, SD, Min, Max) \%>\%
+     ungroup \%>\%
+     mutate(gear = paste(gear, "Gears"),
+            cyl = paste(cyl, "Cylinders")) \%>\%
+     htmlTable_td(header_td = "gear",
+                  cgroup1_td = "cyl",
+                  cell_value = "value",
+                  rnames_td = "summary_stat",
+                  rgroup_td = "per_metric")
+}
 \seealso{
 \code{\link[htmlTable]{htmlTable}}
 }
