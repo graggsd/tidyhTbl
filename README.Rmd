@@ -32,7 +32,9 @@ devtools::install_github("graggsd/tidyhTbl")
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
-library(tidyverse)
+library(magrittr)
+library(tidyr)
+library(dplyr)
 library(tidyhTbl)
 mtcars %>%
     rownames_to_column %>%
