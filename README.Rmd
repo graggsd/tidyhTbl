@@ -1,0 +1,55 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# tidyhTbl
+
+The goal of tidyhTbl is to wrap the `htmlTable` function from the 
+[htmlTable](https://cran.r-project.org/web/packages/htmlTable/index.html)
+package for use with tidy data.
+
+## Installation
+
+You can install tidyhTbl from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("graggsd/tidyhTbl")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+library(tidyverse)
+library(tidyhTbl)
+mtcars %>%
+    rownames_to_column %>%
+    select(rowname, cyl, gear, hp, mpg, qsec) %>%
+    gather(per_metric, value, hp, mpg, qsec) %>%
+    group_by(cyl, gear, per_metric) %>%
+    summarise(Mean = round(mean(value), 1),
+              SD = round(sd(value), 1),
+              Min = round(min(value), 1),
+              Max = round(max(value), 1)) %>%
+     gather(summary_stat, value, Mean, SD, Min, Max) %>%
+     ungroup %>%
+     mutate(gear = paste(gear, "Gears"),
+            cyl = paste(cyl, "Cylinders")) %>%
+     htmlTable_td(header_td = "gear",
+                  cgroup1_td = "cyl",
+                  cell_value = "value",
+                  rnames_td = "summary_stat",
+                  rgroup_td = "per_metric")
+```

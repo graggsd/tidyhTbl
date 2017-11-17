@@ -38,12 +38,13 @@ tidy data and mapping elements of the table to specific columns.
 }
 \examples{
 \dontrun{
+library(tidyverse)
 mtcars \%>\%
     rownames_to_column \%>\%
     select(rowname, cyl, gear, hp, mpg, qsec) \%>\%
     gather(per_metric, value, hp, mpg, qsec) \%>\%
     group_by(cyl, gear, per_metric) \%>\%
-    summarise(Mean = round(mean(value), 1), \%>\%
+    summarise(Mean = round(mean(value), 1),
               SD = round(sd(value), 1),
               Min = round(min(value), 1),
               Max = round(max(value), 1)) \%>\%
