@@ -9,14 +9,14 @@
 #'   \code{htmlTable} function. At minimum, \code{x} must contain the names
 #'   of columns mapping to \code{rnames_td}, \code{header_td}, and \code{rnames_td}.
 #'   \code{header_td} and \code{rnames_td} retain the same meaning as in the
-#'   htmlTable function. \code{value} contains the individual values that will
+#'   htmlTable function. \code{cell_value} contains the individual values that will
 #'   be used to fill each cell within the output \code{htmlTable}.
 #'
 #'   A full list of parameters from \code{htmlTable} which may be mapped to
 #'   columns within \code{x} include:
 #'
 #'   \itemize{
-#'     \item \code{value}
+#'     \item \code{cell_value}
 #'     \item \code{header_td}
 #'     \item \code{rnames_td}
 #'     \item \code{rgroup_td}
@@ -31,12 +31,12 @@
 #'   \code{cgroup2_td}. These parameters correspond to the inward most and outward
 #'   most column groups respectively.
 #'
-#'   Also note that the coordinates of each \code{value} within \code{x} must be
+#'   Also note that the coordinates of each \code{cell_value} within \code{x} must be
 #'   unambiguously mapped to a position within the output \code{htmlTable}.
 #'   Therefore, the each row-wise combination the variables specified above
 #'   contained in \code{x} must be unique.
 #'
-#' @section Hidden values:
+#' @section Hidden value:
 #'   \code{htmlTable} Allows for some values within \code{rgroup_td},
 #'   \code{cgroup}, etc. to be specified as \code{""}. The following parameters
 #'   allow for specific values to be treated as if they were a string of length
@@ -48,7 +48,7 @@
 #'   }
 #'
 #' @param x Tidy data used to build the \code{htmlTable}
-#' @param value The column containing values filling individual cells of the
+#' @param cell_value The column containing values filling individual cells of the
 #' output \code{htmlTable}
 #' @param header_td The column in \code{x} specifying column headings
 #' @param rnames_td The column in \code{x} specifying row names
@@ -71,24 +71,24 @@
 #' mtcars %>%
 #'     rownames_to_column %>%
 #'     select(rowname, cyl, gear, hp, mpg, qsec) %>%
-#'     gather(per_metric, value, hp, mpg, qsec) %>%
+#'     gather(per_metric, cell_value, hp, mpg, qsec) %>%
 #'     group_by(cyl, gear, per_metric) %>%
-#'     summarise(Mean = round(mean(value), 1),
-#'               SD = round(sd(value), 1),
-#'               Min = round(min(value), 1),
-#'               Max = round(max(value), 1)) %>%
-#'      gather(summary_stat, value, Mean, SD, Min, Max) %>%
+#'     summarise(Mean = round(mean(cell_value), 1),
+#'               SD = round(sd(cell_value), 1),
+#'               Min = round(min(cell_value), 1),
+#'               Max = round(max(cell_value), 1)) %>%
+#'      gather(summary_stat, cell_value, Mean, SD, Min, Max) %>%
 #'      ungroup %>%
 #'      mutate(gear = paste(gear, "Gears"),
 #'             cyl = paste(cyl, "Cylinders")) %>%
 #'      htmlTable_td(header_td = "gear",
 #'                   cgroup1_td = "cyl",
-#'                   cell_value = "value",
+#'                   cell_value = "cell_value",
 #'                   rnames_td = "summary_stat",
 #'                   rgroup_td = "per_metric")
 #' }
 htmlTable_td <- function(x,
-                          value = "value",
+                          cell_value = "cell_value",
                           header_td = "header_td",
                           rnames_td = "rnames_td",
                           rgroup_td = NULL,
@@ -108,7 +108,7 @@ htmlTable_td.default <- function(x, ...) {
 
 #' @export
 htmlTable_td.data.frame <- function(x,
-                                     value = "value",
+                                     cell_value = "cell_value",
                                      header_td = "header_td",
                                      rnames_td = "rnames_td",
                                      rgroup_td = NULL,
@@ -120,7 +120,7 @@ htmlTable_td.data.frame <- function(x,
                                      ...) {
 
     argument_checker(x,
-                     value = value,
+                     cell_value = cell_value,
                      header_td = header_td,
                      rnames_td = rnames_td,
                      rgroup_td = rgroup_td,
@@ -173,7 +173,7 @@ htmlTable_td.data.frame <- function(x,
                     cgroup2_td = cgroup2_td)
 
     # Format the values for display
-    to_select <- c("r_idx", "c_idx", value)
+    to_select <- c("r_idx", "c_idx", cell_value)
 
     formatted_df <- x %>%
         add_col_idx(header_td = header_td,
@@ -183,12 +183,12 @@ htmlTable_td.data.frame <- function(x,
                     rgroup_td = rgroup_td,
                     tspanner_td = tspanner_td) %>%
         dplyr::select(to_select) %>%
-        dplyr::mutate_at(value, as.character) %>%
+        dplyr::mutate_at(cell_value, as.character) %>%
         # Spread will fill missing values (both explict and implicit) with the
         # same value, so we need to convert these values to a character if we want
         # them to show up correctly in the final table
         tidyr::spread(key = c_idx,
-                      value = value,
+                      value = cell_value,
                       fill = "") %>%
         dplyr::select(-r_idx)
 
@@ -308,7 +308,7 @@ simplify_arg_list <- function(...) {
 get_col_vars <- function(...) {
     out <- simplify_arg_list(...)
     return(out[names(out) %in%
-                   c("value", "header_td",
+                   c("cell_value", "header_td",
                      "rnames_td", "rgroup_td",
                      "cgroup1_td", "cgroup2_td",
                      "tspanner_td")])
