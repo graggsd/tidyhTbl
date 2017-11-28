@@ -1,5 +1,24 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+Development of this package has been abandoned
+==============================================
+
+The main function in this package has now been incorporated into the official version of the [htmlTable](https://cran.r-project.org/web/packages/htmlTable/index.html) package, and development of this package will not longer be supported.
+
+In the `htmlTable` package, the `htmlTable_td` function has been renamed to `tidyHtmlTable` with additional changes made to parameter names.
+
+See `?tidyHtmlTable` for further details.
+
+``` r
+
+# For the dev version of htmlTable
+install.packages("devtools")
+devtools::install_github("gforge/tidyhTbl")
+
+# For the lastest CRAN release
+install.packages("htmlTable")
+```
+
 [![Build Status](https://travis-ci.org/graggsd/tidyhTbl.svg?branch=master)](https://travis-ci.org/graggsd/tidyhTbl)
 
 tidyhTbl
@@ -13,7 +32,7 @@ Installation
 You can install tidyhTbl from github with:
 
 ``` r
-# install.packages("devtools")
+install.packages("devtools")
 devtools::install_github("graggsd/tidyhTbl")
 ```
 
@@ -74,46 +93,41 @@ mtcars %>%
 <th style="border-bottom: 1px solid grey;">
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-3 Gears
+1
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-4 Gears
+2
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-5 Gears
+3
 </th>
 <th style="border-bottom: 1px solid grey;" colspan="1">
  
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-3 Gears
+4
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-4 Gears
+5
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-5 Gears
+6
 </th>
 <th style="border-bottom: 1px solid grey;" colspan="1">
  
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-3 Gears
+7
 </th>
 <th style="border-bottom: 1px solid grey; text-align: center;">
-5 Gears
+8
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td colspan="11" style="font-weight: 900;">
-hp
-</td>
-</tr>
-<tr>
 <td style="text-align: left;">
-  Max
+1
 </td>
 <td style="text-align: center;">
 97
@@ -148,7 +162,7 @@ hp
 </tr>
 <tr>
 <td style="text-align: left;">
-  Mean
+2
 </td>
 <td style="text-align: center;">
 97
@@ -183,7 +197,7 @@ hp
 </tr>
 <tr>
 <td style="text-align: left;">
-  Min
+3
 </td>
 <td style="text-align: center;">
 97
@@ -218,7 +232,7 @@ hp
 </tr>
 <tr>
 <td style="text-align: left;">
-  SD
+4
 </td>
 <td style="text-align: center;">
 NaN
@@ -252,13 +266,8 @@ NaN
 </td>
 </tr>
 <tr>
-<td colspan="11" style="font-weight: 900;">
-mpg
-</td>
-</tr>
-<tr>
 <td style="text-align: left;">
-  Max
+5
 </td>
 <td style="text-align: center;">
 21.5
@@ -293,7 +302,7 @@ mpg
 </tr>
 <tr>
 <td style="text-align: left;">
-  Mean
+6
 </td>
 <td style="text-align: center;">
 21.5
@@ -328,7 +337,7 @@ mpg
 </tr>
 <tr>
 <td style="text-align: left;">
-  Min
+7
 </td>
 <td style="text-align: center;">
 21.5
@@ -363,7 +372,7 @@ mpg
 </tr>
 <tr>
 <td style="text-align: left;">
-  SD
+8
 </td>
 <td style="text-align: center;">
 NaN
@@ -397,13 +406,8 @@ NaN
 </td>
 </tr>
 <tr>
-<td colspan="11" style="font-weight: 900;">
-qsec
-</td>
-</tr>
-<tr>
 <td style="text-align: left;">
-  Max
+9
 </td>
 <td style="text-align: center;">
 20
@@ -438,7 +442,7 @@ qsec
 </tr>
 <tr>
 <td style="text-align: left;">
-  Mean
+10
 </td>
 <td style="text-align: center;">
 20
@@ -473,7 +477,7 @@ qsec
 </tr>
 <tr>
 <td style="text-align: left;">
-  Min
+11
 </td>
 <td style="text-align: center;">
 20
@@ -508,7 +512,7 @@ qsec
 </tr>
 <tr>
 <td style="border-bottom: 2px solid grey; text-align: left;">
-  SD
+12
 </td>
 <td style="border-bottom: 2px solid grey; text-align: center;">
 NaN

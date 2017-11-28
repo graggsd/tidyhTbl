@@ -24,7 +24,7 @@ to `tidyHtmlTable` with  additional changes made to parameter names.
 
 See `?tidyHtmlTable` for further details.
 
-```{r gh-installation, eval=FALSE}
+```{r, eval=FALSE}
 
 # For the dev version of htmlTable
 install.packages("devtools")
