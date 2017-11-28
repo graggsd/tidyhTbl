@@ -1,24 +1,65 @@
-#' Generate an htmlTable from tidy data
+#' Generate an htmlTable using a ggplot2-like interface
 #'
-#' A wrapper script for \code{htmlTable} that will build an htmlTable using
-#' tidy data and mapping elements of the table to specific columns.
+#' Builds an \code{htmlTable} by mapping columns from the input data, \code{x},
+#' to elements of an output \code{htmlTable} (e.g. rnames_td, header_td, etc.)
 #'
-#' @param x The tidy data used to build the table
-#' @param value The individual values which will fill each cell of the
-#' table
+#' @section Column-mapping parameters:
+#'   The \code{htmlTable_td} function is designed to work like ggplot2 in that
+#'   columns from \code{x} are mapped to specific parameters from the
+#'   \code{htmlTable} function. At minimum, \code{x} must contain the names
+#'   of columns mapping to \code{rnames_td}, \code{header_td}, and \code{rnames_td}.
+#'   \code{header_td} and \code{rnames_td} retain the same meaning as in the
+#'   htmlTable function. \code{value} contains the individual values that will
+#'   be used to fill each cell within the output \code{htmlTable}.
+#'
+#'   A full list of parameters from \code{htmlTable} which may be mapped to
+#'   columns within \code{x} include:
+#'
+#'   \itemize{
+#'     \item \code{value}
+#'     \item \code{header_td}
+#'     \item \code{rnames_td}
+#'     \item \code{rgroup_td}
+#'     \item \code{cgroup1_td}
+#'     \item \code{cgroup2_td}
+#'     \item \code{tspanner_td}
+#'   }
+#'
+#'   Note that unlike in \code{htmlTable} which contains \code{cgroup},
+#'   and which may specify a variable number of column groups,
+#'   \code{htmlTable_td} contains the parameters \code{cgroup1_td} and
+#'   \code{cgroup2_td}. These parameters correspond to the inward most and outward
+#'   most column groups respectively.
+#'
+#'   Also note that the coordinates of each \code{value} within \code{x} must be
+#'   unambiguously mapped to a position within the output \code{htmlTable}.
+#'   Therefore, the each row-wise combination the variables specified above
+#'   contained in \code{x} must be unique.
+#'
+#' @section Hidden values:
+#'   \code{htmlTable} Allows for some values within \code{rgroup_td},
+#'   \code{cgroup}, etc. to be specified as \code{""}. The following parameters
+#'   allow for specific values to be treated as if they were a string of length
+#'   zero in the \code{htmlTable} function.
+#'
+#'   \itemize{
+#'     \item \code{hidden_rgroup_td}
+#'     \item \code{hidden_tspanner_td}
+#'   }
+#'
+#' @param x Tidy data used to build the \code{htmlTable}
+#' @param value The column containing values filling individual cells of the
+#' output \code{htmlTable}
 #' @param header_td The column in \code{x} specifying column headings
 #' @param rnames_td The column in \code{x} specifying row names
 #' @param rgroup_td The column in \code{x} specifying row groups
-#' @param hidden_rgroup rgroups that will be hidden.
+#' @param hidden_rgroup_td rgroup_td values that will be hidden.
 #' @param cgroup1_td The column in \code{x} specifying the inner most column
 #'  groups
 #' @param cgroup2_td The column in \code{x} specifying the outer most column
 #'  groups
-#' @param tspanner_td The column in \code{x} specifying tspanner groups
-#' @param hidden_tspanner tspanners that will be hidden.
-#' @param debug_l Setting to true will print a message at certain points in the
-#' execution of the function. This is meant to only be a temporary feature
-#' as I learn to better utilizing existing debugging features in R Studio.
+#' @param tspanner_td The column in \code{x} specifying tspanner_td groups
+#' @param hidden_tspanner_td tspanner_td values that will be hidden.
 #' @param ... Additional arguments that will be passed to the inner
 #' \code{htmlTable} function
 #' @return Returns html code that will build a pretty table
@@ -47,44 +88,47 @@
 #'                   rgroup_td = "per_metric")
 #' }
 htmlTable_td <- function(x,
-                         value = "value",
-                         header_td = "header",
-                         rnames_td = "rnames",
-                         rgroup_td = NULL,
-                         hidden_rgroup = NULL,
-                         cgroup1_td = NULL,
-                         cgroup2_td = NULL,
-                         tspanner_td = NULL,
-                         hidden_tspanner = NULL,
-                         debug_l = FALSE,
-                         ...) {
+                          value = "value",
+                          header_td = "header_td",
+                          rnames_td = "rnames_td",
+                          rgroup_td = NULL,
+                          hidden_rgroup_td = NULL,
+                          cgroup1_td = NULL,
+                          cgroup2_td = NULL,
+                          tspanner_td = NULL,
+                          hidden_tspanner_td = NULL,
+                          ...) {
     UseMethod("htmlTable_td")
 }
 
 #' @export
+htmlTable_td.default <- function(x, ...) {
+    stop("x must be of class data.frame")
+}
+
+#' @export
 htmlTable_td.data.frame <- function(x,
-                                    value = "value",
-                                    header_td = "header",
-                                    rnames_td = "rnames",
-                                    rgroup_td = NULL,
-                                    hidden_rgroup = NULL,
-                                    cgroup1_td = NULL,
-                                    cgroup2_td = NULL,
-                                    tspanner_td = NULL,
-                                    hidden_tspanner = NULL,
-                                    debug_l = FALSE,
-                                    ...) {
+                                     value = "value",
+                                     header_td = "header_td",
+                                     rnames_td = "rnames_td",
+                                     rgroup_td = NULL,
+                                     hidden_rgroup_td = NULL,
+                                     cgroup1_td = NULL,
+                                     cgroup2_td = NULL,
+                                     tspanner_td = NULL,
+                                     hidden_tspanner_td = NULL,
+                                     ...) {
 
     argument_checker(x,
                      value = value,
                      header_td = header_td,
                      rnames_td = rnames_td,
                      rgroup_td = rgroup_td,
-                     hidden_rgroup = NULL,
+                     hidden_rgroup_td = NULL,
                      cgroup1_td = cgroup1_td,
                      cgroup2_td = cgroup2_td,
                      tspanner_td = tspanner_td,
-                     hidden_tspanner = NULL)
+                     hidden_tspanner_td = NULL)
 
     check_uniqueness(x,
                      header_td = header_td,
@@ -102,41 +146,31 @@ htmlTable_td.data.frame <- function(x,
                         cgroup2_td = cgroup2_td,
                         tspanner_td = tspanner_td)
 
-    if (debug_l) print("S1 complete")
-
-    # Create tables from which to gather row, column, and tspanner names
+    # Create tables from which to gather row, column, and tspanner_td names
     # and indices
     row_ref_tbl <- x %>%
         get_row_tbl(rnames_td = rnames_td,
                     rgroup_td = rgroup_td,
                     tspanner_td = tspanner_td)
 
-    if (debug_l) print("S2 complete")
-
-    # Hide row groups specified in hidden_rgroup
-    if (!(is.null(hidden_rgroup))) {
-
+    # Hide row groups specified in hidden_rgroup_td
+    if (!(is.null(hidden_rgroup_td))) {
         row_ref_tbl <- row_ref_tbl %>%
-            mutate_at(rgroup_td,
-                      function(x){ifelse(x %in% hidden_rgroup, "", x)})
+            dplyr::mutate_at(rgroup_td,
+                             function(x){ifelse(x %in% hidden_rgroup_td, "", x)})
     }
 
-    # Hide tspanners specified in hidden_tspanner
-    if (!(is.null(hidden_tspanner))) {
-
+    # Hide tspanner_tds specified in hidden_tspanner_td
+    if (!(is.null(hidden_tspanner_td))) {
         row_ref_tbl <- row_ref_tbl %>%
-            mutate_at(tspanner_td,
-                      function(x){ifelse(x %in% hidden_tspanner, "", x)})
+            dplyr::mutate_at(tspanner_td,
+                             function(x){ifelse(x %in% hidden_tspanner_td, "", x)})
     }
-
-    if (debug_l) print("S3 complete")
 
     col_ref_tbl <- x %>%
         get_col_tbl(header_td = header_td,
                     cgroup1_td = cgroup1_td,
                     cgroup2_td = cgroup2_td)
-
-    if (debug_l) print("S4 complete")
 
     # Format the values for display
     to_select <- c("r_idx", "c_idx", value)
@@ -158,20 +192,16 @@ htmlTable_td.data.frame <- function(x,
                       fill = "") %>%
         dplyr::select(-r_idx)
 
-    if (debug_l) print("S5 complete")
-
-    # Get names and indices for row groups and tspanners
+    # Get names and indices for row groups and tspanner_tds
     htmlTable_args <- list(x = formatted_df,
-                           rnames = row_ref_tbl %>% dplyr::pull(rnames_td),
-                           header = col_ref_tbl %>% dplyr::pull(header_td),
+                           rnames_td = row_ref_tbl %>% dplyr::pull(rnames_td),
+                           header_td = col_ref_tbl %>% dplyr::pull(header_td),
                            ...)
-
-    if (debug_l) print("S6 complete")
 
     if (!is.null(rgroup_td)) {
 
         # This will take care of a problem in which adjacent row groups
-        # with the same value will cause rgroup and tspanner collision
+        # with the same value will cause rgroup_td and tspanner_td collision
         comp_val <- row_ref_tbl %>% dplyr::pull(rgroup_td)
 
         if (!is.null(tspanner_td)) {
@@ -182,50 +212,45 @@ htmlTable_td.data.frame <- function(x,
         lens <- rle(comp_val)$lengths
         idx <- cumsum(lens)
 
-        htmlTable_args$rgroup <- row_ref_tbl %>%
+        htmlTable_args$rgroup_td <- row_ref_tbl %>%
             dplyr::slice(idx) %>%
             dplyr::pull(rgroup_td)
 
-        htmlTable_args$n.rgroup <- lens
+        htmlTable_args$n.rgroup_td <- lens
     }
 
-    if (debug_l) print("S7 complete")
-
     if (!is.null(tspanner_td)) {
-        htmlTable_args$tspanner <-
+        htmlTable_args$tspanner_td <-
             rle(row_ref_tbl %>% dplyr::pull(tspanner_td))$value
-        htmlTable_args$n.tspanner <-
+        htmlTable_args$n.tspanner_td <-
             rle(row_ref_tbl %>% dplyr::pull(tspanner_td))$lengths
     }
 
-    if (debug_l) print("S8 complete")
-
     # Get names and indices for column groups
     if(!is.null(cgroup1_td)) {
-        cgroup1 <- rle(col_ref_tbl %>% dplyr::pull(cgroup1_td))$value
-        n.cgroup1 <- rle(col_ref_tbl %>% dplyr::pull(cgroup1_td))$lengths
+        cgroup1_td_out <- rle(col_ref_tbl %>% dplyr::pull(cgroup1_td))$value
+        n.cgroup1_td <- rle(col_ref_tbl %>% dplyr::pull(cgroup1_td))$lengths
         if(!is.null(cgroup2_td)) {
-            cgroup2 <- rle(col_ref_tbl %>% dplyr::pull(cgroup2_td))$value
-            n.cgroup2 <- rle(col_ref_tbl %>% dplyr::pull(cgroup2_td))$lengths
-            len_diff <- length(cgroup1) - length(cgroup2)
+            cgroup2_td_out <- rle(col_ref_tbl %>% dplyr::pull(cgroup2_td))$value
+            n.cgroup2_td <- rle(col_ref_tbl %>% dplyr::pull(cgroup2_td))$lengths
+            len_diff <- length(cgroup1_td_out) - length(cgroup2_td_out)
             if (len_diff < 0) {
-                stop("cgroup2 cannot contain more categories than cgroup1")
+                stop("cgroup2_td cannot contain more categories than cgroup1_td")
             } else if (len_diff > 0) {
-                cgroup2 <- c(cgroup2, rep(NA, len_diff))
-                n.cgroup2 <- c(n.cgroup2, rep(NA, len_diff))
+                cgroup2_td_out <- c(cgroup2_td, rep(NA, len_diff))
+                n.cgroup2_td <- c(n.cgroup2_td, rep(NA, len_diff))
             }
-            cgroup1 <- rbind(cgroup2, cgroup1)
-            n.cgroup1 <- rbind(n.cgroup2, n.cgroup1)
+            cgroup1_td_out <- rbind(cgroup2_td, cgroup1_td)
+            n.cgroup1_td <- rbind(n.cgroup2_td, n.cgroup1_td)
         }
-        htmlTable_args$cgroup <- cgroup1
-        htmlTable_args$n.cgroup <- n.cgroup1
+        htmlTable_args$cgroup <- cgroup1_td_out
+        htmlTable_args$n.cgroup <- n.cgroup1_td
     }
-
-    if (debug_l) print("S9 complete")
 
     do.call(htmlTable::htmlTable, htmlTable_args)
 }
 
+# Removes rows containing NA values in any mapped columns from the tidy dataset
 remove_na_rows <- function(x, ...) {
     cols <- as.character(get_col_vars(...))
     na.log <- x %>%
@@ -247,9 +272,11 @@ remove_na_rows <- function(x, ...) {
                        paste(na.cols, collapse = ", "), ". ",
                        removed, " row(s) in the tidy dataset were removed."))
     }
-    return(x[keep.idx,])
+    return(x %>% dplyr::filter(keep.idx))
 }
 
+# This checks to make sure that the mapping columns of the tidy dataset
+# uniquely specify a given value
 check_uniqueness <- function(x, ...) {
     # Get arguments
     args <- simplify_arg_list(...)
@@ -267,12 +294,17 @@ check_uniqueness <- function(x, ...) {
     }
 }
 
+# Converts arguments from ... into a list and removes those that have been set
+# to NULL
 simplify_arg_list <- function(...) {
     x <- list(...)
     idx <- sapply(x, is.null)
     return(x[!idx])
 }
 
+# This function gets arguments from ..., removes those that are NULL,
+# and then subsets those that should map tidy data columns to htmlTable
+# parameters
 get_col_vars <- function(...) {
     out <- simplify_arg_list(...)
     return(out[names(out) %in%
@@ -282,7 +314,14 @@ get_col_vars <- function(...) {
                      "tspanner_td")])
 }
 
+# Checks a variety of assumptions about input arguments and prepares an
+# appropriate error message if those assumptions are violated
 argument_checker <- function(x, ...) {
+
+    # Check if x is a grouped tbl_df
+    if(dplyr::is.grouped_df(x)) {
+        stop("x cannot be a grouped_df")
+    }
 
     # Check that all the input are characters
     all_args <- simplify_arg_list(...)
@@ -324,13 +363,12 @@ get_col_tbl <- function(x,
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols) %>%
+        dplyr::arrange_at(cols) %>%
         # This is necessary in order to not generate NA values when setting
         # hidden elements to ""
         dplyr::mutate_if(is.factor, as.character)
 
     out$c_idx <- 1:nrow(out)
-
     return(out)
 }
 
@@ -344,13 +382,12 @@ get_row_tbl <- function(x,
     out <- x %>%
         dplyr::select(cols) %>%
         unique %>%
-        dplyr::arrange_(.dots = cols) %>%
+        dplyr::arrange_at(cols) %>%
         # This is necessary in order to not generate NA values when setting
         # hidden elements to ""
         dplyr::mutate_if(is.factor, as.character)
 
     out$r_idx <- 1:nrow(out)
-
     return(out)
 }
 
@@ -366,9 +403,10 @@ add_col_idx <- function(x,
                     cgroup1_td = cgroup1_td,
                     cgroup2_td = cgroup2_td)
 
-    out <- x %>%
-        dplyr::left_join(col_idx_df, cols)
-
+    out <- suppressWarnings(
+        x %>%
+            dplyr::left_join(col_idx_df, cols)
+    )
     return(out)
 }
 
@@ -384,8 +422,9 @@ add_row_idx <- function(x,
                     rgroup_td = rgroup_td,
                     tspanner_td = tspanner_td)
 
-    out <- x %>%
-        dplyr::left_join(row_idx_df, by = cols)
-
+    out <- suppressWarnings(
+        x %>%
+            dplyr::left_join(row_idx_df, by = cols)
+    )
     return(out)
 }

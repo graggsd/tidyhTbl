@@ -2,18 +2,18 @@
 % Please edit documentation in R/htmlTable_td.R
 \name{htmlTable_td}
 \alias{htmlTable_td}
-\title{Generate an htmlTable from tidy data}
+\title{Generate an htmlTable using a ggplot2-like interface}
 \usage{
-htmlTable_td(x, value = "value", header_td = "header",
-  rnames_td = "rnames", rgroup_td = NULL, hidden_rgroup = NULL,
+htmlTable_td(x, value = "value", header_td = "header_td",
+  rnames_td = "rnames_td", rgroup_td = NULL, hidden_rgroup_td = NULL,
   cgroup1_td = NULL, cgroup2_td = NULL, tspanner_td = NULL,
-  hidden_tspanner = NULL, debug_l = FALSE, ...)
+  hidden_tspanner_td = NULL, ...)
 }
 \arguments{
-\item{x}{The tidy data used to build the table}
+\item{x}{Tidy data used to build the \code{htmlTable}}
 
-\item{value}{The individual values which will fill each cell of the
-table}
+\item{value}{The column containing values filling individual cells of the
+output \code{htmlTable}}
 
 \item{header_td}{The column in \code{x} specifying column headings}
 
@@ -21,7 +21,7 @@ table}
 
 \item{rgroup_td}{The column in \code{x} specifying row groups}
 
-\item{hidden_rgroup}{rgroups that will be hidden.}
+\item{hidden_rgroup_td}{rgroup_td values that will be hidden.}
 
 \item{cgroup1_td}{The column in \code{x} specifying the inner most column
 groups}
@@ -29,13 +29,9 @@ groups}
 \item{cgroup2_td}{The column in \code{x} specifying the outer most column
 groups}
 
-\item{tspanner_td}{The column in \code{x} specifying tspanner groups}
+\item{tspanner_td}{The column in \code{x} specifying tspanner_td groups}
 
-\item{hidden_tspanner}{tspanners that will be hidden.}
-
-\item{debug_l}{Setting to true will print a message at certain points in the
-execution of the function. This is meant to only be a temporary feature
-as I learn to better utilizing existing debugging features in R Studio.}
+\item{hidden_tspanner_td}{tspanner_td values that will be hidden.}
 
 \item{...}{Additional arguments that will be passed to the inner
 \code{htmlTable} function}
@@ -44,9 +40,57 @@ as I learn to better utilizing existing debugging features in R Studio.}
 Returns html code that will build a pretty table
 }
 \description{
-A wrapper script for \code{htmlTable} that will build an htmlTable using
-tidy data and mapping elements of the table to specific columns.
+Builds an \code{htmlTable} by mapping columns from the input data, \code{x},
+to elements of an output \code{htmlTable} (e.g. rnames_td, header_td, etc.)
 }
+\section{Column-mapping parameters}{
+
+  The \code{htmlTable_td} function is designed to work like ggplot2 in that
+  columns from \code{x} are mapped to specific parameters from the
+  \code{htmlTable} function. At minimum, \code{x} must contain the names
+  of columns mapping to \code{rnames_td}, \code{header_td}, and \code{rnames_td}.
+  \code{header_td} and \code{rnames_td} retain the same meaning as in the
+  htmlTable function. \code{value} contains the individual values that will
+  be used to fill each cell within the output \code{htmlTable}.
+
+  A full list of parameters from \code{htmlTable} which may be mapped to
+  columns within \code{x} include:
+
+  \itemize{
+    \item \code{value}
+    \item \code{header_td}
+    \item \code{rnames_td}
+    \item \code{rgroup_td}
+    \item \code{cgroup1_td}
+    \item \code{cgroup2_td}
+    \item \code{tspanner_td}
+  }
+
+  Note that unlike in \code{htmlTable} which contains \code{cgroup},
+  and which may specify a variable number of column groups,
+  \code{htmlTable_td} contains the parameters \code{cgroup1_td} and
+  \code{cgroup2_td}. These parameters correspond to the inward most and outward
+  most column groups respectively.
+
+  Also note that the coordinates of each \code{value} within \code{x} must be
+  unambiguously mapped to a position within the output \code{htmlTable}.
+  Therefore, the each row-wise combination the variables specified above
+  contained in \code{x} must be unique.
+}
+
+\section{Hidden values}{
+
+  \code{htmlTable} Allows for some values within \code{rgroup_td},
+  \code{cgroup}, etc. to be specified as \code{""}. The following parameters
+  allow for specific values to be treated as if they were a string of length
+  zero in the \code{htmlTable} function.
+
+  \itemize{
+    \item \code{hidden_rgroup_td}
+    \item \code{hidden_tspanner_td}
+  }
+}
+
 \examples{
 \dontrun{
 library(tidyverse)
