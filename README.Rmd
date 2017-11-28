@@ -12,6 +12,30 @@ knitr::opts_chunk$set(
 )
 ```
 
+# Development of this package has been abandoned
+
+The main function in this package has now been incorporated into the official 
+version of the 
+[htmlTable](https://cran.r-project.org/web/packages/htmlTable/index.html)
+package, and development of this package will not longer be supported.
+
+In the `htmlTable` package, the `htmlTable_td` function has been renamed 
+to `tidyHtmlTable` with  additional changes made to parameter names.
+
+See `?tidyHtmlTable` for further details.
+
+```{r gh-installation, eval=FALSE}
+
+# For the dev version of htmlTable
+install.packages("devtools")
+devtools::install_github("gforge/tidyhTbl")
+
+# For the lastest CRAN release
+install.packages("htmlTable")
+
+```
+
+
 [![Build Status](https://travis-ci.org/graggsd/tidyhTbl.svg?branch=master)](https://travis-ci.org/graggsd/tidyhTbl)
 
 # tidyhTbl
@@ -25,7 +49,7 @@ package for use with tidy data.
 You can install tidyhTbl from github with:
 
 ```{r gh-installation, eval = FALSE}
-# install.packages("devtools")
+install.packages("devtools")
 devtools::install_github("graggsd/tidyhTbl")
 ```
 
